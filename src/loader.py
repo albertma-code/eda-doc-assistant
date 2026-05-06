@@ -9,8 +9,8 @@ def load_and_split(pdf_path: str):
     
     # 切块，每块500字，块之间重叠50字
     splitter = RecursiveCharacterTextSplitter(
-        chunk_size=500,
-        chunk_overlap=50
+        chunk_size=1000,
+        chunk_overlap=100
     )
     chunks = splitter.split_documents(documents)
     
