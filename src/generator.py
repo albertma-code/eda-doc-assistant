@@ -1,13 +1,10 @@
 import requests
 
 def generate_answer(question: str, retriever):
-    # 从ChromaDB找最相关的3个文本块
     relevant_chunks = retriever.invoke(question)
     
-    # 拼接成上下文
     context = "\n\n".join([chunk.page_content for chunk in relevant_chunks])
     
-    # 发给本地Ollama
     response = requests.post(
         "http://localhost:11434/api/generate",
         json={
@@ -22,4 +19,15 @@ def generate_answer(question: str, retriever):
         }
     )
     
-    return response.json()["response"]
+    answer = response.json()["response"]
+    
+    # 提取来源信息
+    sources = []
+    for chunk in relevant_chunks:
+        source = chunk.metadata.get("source", "未知文档")
+        page = chunk.metadata.get("page", "未知页码")
+        source_info = f"{source} 第{page+1}页"
+        if source_info not in sources:
+            sources.append(source_info)
+    
+    return answer, sources

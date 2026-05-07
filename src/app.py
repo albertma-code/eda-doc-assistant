@@ -14,12 +14,13 @@ def load_retriever():
         model_name="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
     )
     vectorstore = Chroma(
-        persist_directory="../data/chroma_db",
+        persist_directory="data/chroma_db",
         embedding_function=embeddings
     )
     return get_retriever(vectorstore)
 
-retriever = load_retriever()
+with st.spinner("正在加载知识库，请稍候..."):
+    retriever = load_retriever()
 
 # 初始化聊天历史
 if "messages" not in st.session_state:
@@ -38,6 +39,8 @@ if question := st.chat_input("输入你的问题..."):
 
     with st.chat_message("assistant"):
         with st.spinner("思考中..."):
-            answer = generate_answer(question, retriever)
+            answer, sources = generate_answer(question, retriever)
         st.write(answer)
+        if sources:
+            st.caption("📄 来源：" + " | ".join(sources))
     st.session_state.messages.append({"role": "assistant", "content": answer})

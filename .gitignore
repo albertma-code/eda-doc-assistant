@@ -1,3 +1,5 @@
 .env
 data/chroma_db/
 src/data/
+data/chroma_db/
+src/__pycache__/
